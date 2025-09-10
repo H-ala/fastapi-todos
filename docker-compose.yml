@@ -1,0 +1,35 @@
+services:
+  postgresdb:
+      image: postgres
+      container_name: postgresdb
+      env_file:
+        - ./env/postgres.env
+      volumes:
+        - postgres_data:/var/lib/postgresql/data
+
+  fastapi:
+    build: .
+    container_name: fastapi
+    ports: 
+      - '8000:8000'
+    volumes:
+      - .:/app
+      - ./alembic:/alembic
+    env_file:
+      - ./env/backend.env
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      - postgresdb
+
+
+  pgadmin4:
+    image: dpage/pgadmin4
+    container_name: pgadmin4
+    ports:
+      - "8080:80"
+    env_file:
+      - ./env/pgadmin4.env
+
+
+volumes:
+  postgres_data:
