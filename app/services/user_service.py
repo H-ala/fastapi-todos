@@ -5,6 +5,7 @@ from app.errors.user_errors import (
     UserNotFound, EmailAlreadyExists, UsernameAlreadyExists,
     PasswordMismatch, PasswordAlreadySet, NothingToUpdate
 )
+from app.errors.auth_errors import InsufficientPermission 
 
 
 
@@ -21,6 +22,15 @@ class UserValidator:
     async def validate_username(self, username: str):
         if await self.user_repo.get_user_by_username(username):
             raise UsernameAlreadyExists(f"Username '{username}' already exists")
+    @staticmethod
+    def validate_user(user):
+        if user is None:
+            raise UserNotFound(f"User not found")
+        
+    @staticmethod
+    def validate_role(current_user, user_id):
+        if not current_user.id == user_id and current_user.role == 'user':
+            raise InsufficientPermission()
         
     @staticmethod
     def validate_password(password, repeat_password):
@@ -38,10 +48,10 @@ class UserService:
         self.validator = validator or UserValidator(user_repo)
 
 
-    async def get_user_by_id(self, user_id):
+    async def get_user_by_id(self, current_user, user_id):
         user = await self.user_repo.get_user_by_id(user_id)
-        if user is None:
-            raise UserNotFound(f"User with id {user_id} not found")
+        self.validator.validate_user(user)
+        self.validator.validate_role(current_user, user_id)
         return user    
 
 
@@ -56,9 +66,11 @@ class UserService:
         return await self.user_repo.create_user(user_data)
 
 
-    async def update_user(self, user_id, user_data):
-        user = await self.get_user_by_id(user_id)
+    async def update_user(self, current_user, user_id, user_data):
+        user = await self.user_repo.get_user_by_id(user_id)
 
+        self.validator.validate_user(user)
+        self.validator.validate_role(current_user, user_id)
         fields_to_update = {k: v for k, v in user_data.items() if v is not None}
 
         if not fields_to_update:
@@ -81,7 +93,18 @@ class UserService:
         fields_to_update["updated_at"] = datetime.now()
         await self.user_repo.update_user(user_id, fields_to_update) 
 
-        return await self.get_user_by_id(user_id)
+        return await self.user_repo.get_user_by_id(user_id)
+    
+
+    async def delete_user(self, current_user, user_id):
+        user = await self.user_repo.get_user_by_id(user_id)
+
+        self.validator.validate_user(user)
+        self.validator.validate_role(current_user, user_id)
+
+        await self.user_repo.delete_user(user_id)
+        
+
 
 
         

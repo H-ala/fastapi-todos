@@ -17,7 +17,7 @@ async def get_all_users(limit: int = Query(10, ge=1, le=100),
                         offset: int = Query(0, ge=0), 
                         repo: UserRepo = Depends(get_user_repo),
                         current_user = Depends(get_current_user),
-                        role_check = Depends(role_checker(["user", "admin"]))):
+                        role_check = Depends(role_checker(["admin"]))):
     return await repo.get_all_users(limit, offset)
 
 
@@ -27,12 +27,10 @@ async def get_all_users(limit: int = Query(10, ge=1, le=100),
 # ===================== GET users by id =====================
 @user_router.get("/{user_id}", status_code=status.HTTP_200_OK)
 async def get_user_by_id(user_id: int = Path(gt=0), 
-                         service: UserService = Depends(get_user_service)):
-    try:
-        return await service.get_user_by_id(user_id)
-    except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-
+                         service: UserService = Depends(get_user_service),
+                         current_user = Depends(get_current_user),
+                         role_check = Depends(role_checker(["user", "admin"]))):
+    return await service.get_user_by_id(current_user, user_id)
 
 
 
@@ -42,11 +40,7 @@ async def get_user_by_id(user_id: int = Path(gt=0),
 @user_router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_user(user_data: UserRequest, 
                       service: UserService = Depends(get_user_service)):
-    try: 
-        new_user = await service.create_user(user_data.model_dump())
-        return new_user
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    return await service.create_user(user_data.model_dump())
 
 
 
@@ -57,27 +51,22 @@ async def create_user(user_data: UserRequest,
 @user_router.patch("/{user_id}", status_code=status.HTTP_200_OK)
 async def update_user(user_data: UserUpdateRequest, 
                       user_id: int = Path(gt=0), 
-                      service: UserService = Depends(get_user_service)):
+                      service: UserService = Depends(get_user_service),
+                      current_user = Depends(get_current_user),
+                      role_checker = Depends(role_checker(["user", "admin"]))):
     
-    try: 
-        updated_user = await service.update_user(user_id, user_data.model_dump())
-        return updated_user
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    return await service.update_user(current_user, user_id, user_data.model_dump())
 
 
 
 
-
-
-
-# # ===================== DELETE user =====================
-# @user_router.delete("/todos/{todo_id}",  status_code=status.HTTP_204_NO_CONTENT)
-# async def delete_todo(todo_id: int = Path(gt=0), repo: UserRepo = Depends(get_user_repo)):
-#    to_be_deleted = await repo.delete_todo(todo_id)
-#    if not to_be_deleted:
-#        raise HTTPException(status_code=404, detail="Todo not found")
-#    return
+# ===================== DELETE user =====================
+@user_router.delete("/{user_id}",  status_code=status.HTTP_204_NO_CONTENT)
+async def delete_user(user_id: int = Path(gt=0),
+                      service: UserService = Depends(get_user_service),
+                      current_user = Depends(get_current_user),
+                      role_checker = Depends(role_checker(["user", "admin"]))):
+    await service.delete_user(current_user, user_id)
 
 
 

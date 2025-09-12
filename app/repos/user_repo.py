@@ -55,6 +55,12 @@ class UserRepo:
         return 
     
 
+    async def delete_user(self, user_id: int):
+        await self.db.execute(text("DELETE FROM users WHERE id = :id"), {"id": user_id})
+        await self.db.commit()
+        return
+
+
     async def increment_token_version(self, user_id: int):
         query = text("UPDATE users SET token_version = token_version + 1 WHERE id = :user_id")
         await self.db.execute(query, {"user_id": user_id})

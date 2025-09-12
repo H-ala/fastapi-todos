@@ -48,7 +48,7 @@ class AuthService:
         user = await self.user_repo.get_user_by_id(user_id)
         if not user:
             UserNotFound()
-        if token_version != user["token_version"]:
+        if token_version != user.get("token_version"):
             raise RevokedToken()
         return user
     
