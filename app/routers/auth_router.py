@@ -17,7 +17,8 @@ auth_router = APIRouter(prefix="/auth")
 
 # ===================== GET access token =====================
 @auth_router.post("/login", status_code=status.HTTP_200_OK)
-async def get_all_users(login_data: LoginRequest, service: AuthService = Depends(get_auth_service)):
+async def get_all_users(login_data: LoginRequest, 
+                        service: AuthService = Depends(get_auth_service)):
     user_data = await service.authenticate_user(
         username=login_data.username,
         email=login_data.email,

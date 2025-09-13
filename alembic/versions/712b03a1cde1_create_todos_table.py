@@ -28,7 +28,7 @@ def upgrade() -> None:
         description VARCHAR(200),
         priority INTEGER CHECK (priority >= 1 AND priority <=5),
         complete BOOLEAN NOT NULL DEFAULT FALSE,
-        owner_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
         );

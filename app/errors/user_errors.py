@@ -24,5 +24,5 @@ class PasswordAlreadySet(UserError):
     """New password is same as old password"""
     pass
 
-class NothingToUpdate(UserError):
+class UserNothingToUpdate(UserError):
     pass

@@ -3,7 +3,7 @@ from app.utils.security import hash_password, verify_password
 from datetime import datetime
 from app.errors.user_errors import (
     UserNotFound, EmailAlreadyExists, UsernameAlreadyExists,
-    PasswordMismatch, PasswordAlreadySet, NothingToUpdate
+    PasswordMismatch, PasswordAlreadySet, UserNothingToUpdate
 )
 from app.errors.auth_errors import InsufficientPermission 
 
@@ -74,7 +74,7 @@ class UserService:
         fields_to_update = {k: v for k, v in user_data.items() if v is not None}
 
         if not fields_to_update:
-            raise NothingToUpdate("No fields provided for update")
+            raise UserNothingToUpdate("No fields provided for update")
 
         if "email" in fields_to_update:
             await self.validator.validate_email(fields_to_update["email"])

@@ -10,6 +10,7 @@ from fastapi.security import OAuth2PasswordBearer
 from typing import List
 from app.errors.auth_errors import InsufficientPermission
 from app.repos.todo_repo import TodoRepo
+from app.services.todo_service import TodoService
 
 
 
@@ -26,6 +27,9 @@ def get_user_repo(db: AsyncSession = Depends(get_db)) -> UserRepo:
 
 def get_auth_repo(db: AsyncSession = Depends(get_db)) -> AuthRepo:
     return AuthRepo(db)
+
+def get_todo_service(repo: TodoRepo = Depends(get_todo_repo)) -> TodoService:
+    return TodoService(repo)
 
 def get_user_service(repo: UserRepo = Depends(get_user_repo)) -> UserService:
     return UserService(repo)

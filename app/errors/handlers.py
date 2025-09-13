@@ -6,12 +6,16 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from app.errors.user_errors import (
     UserNotFound, EmailAlreadyExists, UsernameAlreadyExists,
-    PasswordMismatch, PasswordAlreadySet, NothingToUpdate
+    PasswordMismatch, PasswordAlreadySet, UserNothingToUpdate
 )
 
 from app.errors.auth_errors import (
     InvalidCredentials, RevokedToken, FieldRequired, InvalidToken,
     AccessTokenRequired, InsufficientPermission
+)
+
+from app.errors.todo_errors import (
+    TodoNotFound, TodoNothingToUpdate
 )
 
 def create_exception_handler(status_code: int, initial_details: Any) -> Callable[[Request, Exception], JSONResponse]:
@@ -23,7 +27,6 @@ def create_exception_handler(status_code: int, initial_details: Any) -> Callable
     return exception_handler
 
 def register_all_errors(app: FastAPI):
-    # کاربران
     app.add_exception_handler(
         UserNotFound,
         create_exception_handler(
@@ -61,7 +64,15 @@ def register_all_errors(app: FastAPI):
     )
     
     app.add_exception_handler(
-        NothingToUpdate,
+        UserNothingToUpdate,
+        create_exception_handler(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            initial_details={"message": "No fields provided for update", "error_code": "nothing_to_update"}
+        )
+    )
+
+    app.add_exception_handler(
+        TodoNothingToUpdate,
         create_exception_handler(
             status_code=status.HTTP_400_BAD_REQUEST,
             initial_details={"message": "No fields provided for update", "error_code": "nothing_to_update"}
@@ -132,6 +143,14 @@ def register_all_errors(app: FastAPI):
                 "message": "you are not allowed to perform this action",
                 "error_code": "permission_denied"
             }
+        )
+    )
+
+    app.add_exception_handler(
+        TodoNotFound,
+        create_exception_handler(
+            status_code=status.HTTP_404_NOT_FOUND,
+            initial_details={"message": "Todo not found", "error_code": "todo_not_found"}
         )
     )
 
