@@ -20,10 +20,10 @@ def create_access_token(user_data , expires_delta: timedelta = None):
     now = datetime.now()
     expire = now + (expires_delta if expires_delta else timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES))
     jti = secrets.token_urlsafe(64)
-    payload = {"sub": str(user_data.id), 
-               "email": user_data.email, 
-               "role": user_data.role, 
-               "token_version": user_data.token_version, 
+    payload = {"sub": str(user_data["id"]), 
+               "email": user_data["email"], 
+               "role": user_data["role"], 
+               "token_version": user_data["token_version"], 
                "iat": now,
                "jti": jti,
                "exp": expire

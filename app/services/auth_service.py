@@ -20,10 +20,11 @@ class AuthService:
     async def authenticate_user(self, username: str, email: str, password: str):
         if not username and not email:
             raise FieldRequired()
+    
+        user = None
         if username:
             user = await self.user_repo.get_user_by_username(username)
-
-        elif email:
+        if not user and email:
             user = await self.user_repo.get_user_by_email(email)
 
         if not user:

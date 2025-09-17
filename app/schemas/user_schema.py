@@ -17,4 +17,11 @@ class UserUpdateRequest(BaseModel):
     email: EmailStr | None = Field(default=None)
     password: str | None = Field(default=None, min_length=3)
     repeat_password: str | None = Field(default=None, min_length=3)
+
+
+class UserOut(BaseModel):
+    first_name: Optional[str] = Field(None, min_length=3)
+    last_name: Optional[str] = Field(None, min_length=3)
+    username: str = Field(..., min_length=3)
+    email: EmailStr = Field(...)
     

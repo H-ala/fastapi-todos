@@ -25,7 +25,7 @@ async def get_all_users(login_data: LoginRequest,
         password=login_data.password
     )
 
-    access_token = create_access_token(user_data)
+    access_token = create_access_token(dict(user_data))
     refresh_token = create_refresh_token()
 
     await service.save_refresh_token(refresh_token, user_data["id"])
@@ -35,12 +35,9 @@ async def get_all_users(login_data: LoginRequest,
     return JSONResponse(
                 content={
                     "massage": "login successful",
+                    "token_type": "bearer",
                     "access_token": access_token,
-                    "refresh_token": refresh_token,
-                    "user": {
-                        "email": user_data.email,
-                        "id": str(user_data.id)
-                    }
+                    "refresh_token": refresh_token
                 }
             )
 

@@ -16,6 +16,9 @@ app = FastAPI(
     contact={"email": "hos.ala81@gmail.com"},
     )
 
+@app.get("/")
+def health_check():
+    return {"message": "Hello World"}
 
 register_all_errors(app)
 

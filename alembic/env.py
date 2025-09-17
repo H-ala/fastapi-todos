@@ -5,13 +5,30 @@ from sqlalchemy import pool
 
 from alembic import context
 import os
+from app.core.config import settings
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
-DATABASE_URL = f"postgresql+psycopg2://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}@{os.getenv('POSTGRES_HOST')}:5432/{os.getenv('POSTGRES_DB')}"
+
+DATABASE_URL = settings.DATABASE_URL
+DATABASE_URL = DATABASE_URL.replace("asyncpg", "psycopg2")
 
 config = context.config
 config.set_main_option("sqlalchemy.url", DATABASE_URL)
+
+def get_database_url():
+    # when using pytest
+    if os.getenv('TEST_DATABASE_URL'):
+        return os.getenv('TEST_DATABASE_URL')
+    
+    # the URL we assigned above
+    return config.get_main_option("sqlalchemy.url")
+
+
+config.set_main_option("sqlalchemy.url", get_database_url())
+
+# config = context.config
+# config.set_main_option("sqlalchemy.url", DATABASE_URL)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -42,6 +59,8 @@ def run_migrations_offline() -> None:
     script output.
 
     """
+
+
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
         url=url,

@@ -82,7 +82,7 @@ def register_all_errors(app: FastAPI):
     app.add_exception_handler(
         InvalidCredentials,
         create_exception_handler(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_403_FORBIDDEN,
             initial_details={
                 "message": "Invalid email or password.",
                 "error_code": "invalid_email_or_password"

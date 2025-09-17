@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, status, Path, HTTPException, Query
-from app.schemas.user_schema import UserRequest, UserUpdateRequest
+from app.schemas.user_schema import UserRequest, UserUpdateRequest, UserOut
 from app.repos.user_repo import UserRepo
 from app.services.user_service import UserService
 from app.core.dependencies import get_user_repo, get_user_service, get_current_user, role_checker
@@ -37,7 +37,7 @@ async def get_user_by_id(user_id: int = Path(gt=0),
 
 
 # ===================== CREATE user =====================
-@user_router.post("/", status_code=status.HTTP_201_CREATED)
+@user_router.post("/", status_code=status.HTTP_201_CREATED, response_model=UserOut)
 async def create_user(user_data: UserRequest, 
                       service: UserService = Depends(get_user_service)):
     return await service.create_user(user_data.model_dump())

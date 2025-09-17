@@ -8,7 +8,9 @@ services:
         - postgres_data:/var/lib/postgresql/data
 
   fastapi:
-    build: .
+    build:
+      context: .
+      dockerfile: dev.dockerfile
     container_name: fastapi
     ports: 
       - '8000:8000'
@@ -17,7 +19,6 @@ services:
       - ./alembic:/alembic
     env_file:
       - ./env/backend.env
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     depends_on:
       - postgresdb
 

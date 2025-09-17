@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, status, Path, HTTPException, Query
-from app.schemas.todo_schema import TodoRequest, TodoUpdateRequest
+from app.schemas.todo_schema import TodoRequest, TodoUpdateRequest, TodoOut
 from app.core.dependencies import get_todo_service, role_checker, get_current_user
 from app.services.todo_service import TodoService
+from typing import List
 
 
 
@@ -11,7 +12,7 @@ todo_router = APIRouter(prefix="/todos")
 
 
 # ===================== GET all todos =====================
-@todo_router.get("/", status_code=status.HTTP_200_OK)
+@todo_router.get("/", status_code=status.HTTP_200_OK, response_model=List[TodoOut])
 async def get_all_todos(limit: int = Query(10, ge=1, le=100),
                         offset: int = Query(0, ge=0), 
                         service: TodoService = Depends(get_todo_service),
@@ -22,7 +23,7 @@ async def get_all_todos(limit: int = Query(10, ge=1, le=100),
 
 
 # ===================== GET todo by id =====================
-@todo_router.get("/{todo_id}", status_code=status.HTTP_200_OK)
+@todo_router.get("/{todo_id}", status_code=status.HTTP_200_OK, response_model=TodoOut)
 async def get_todo_by_id(todo_id: int = Path(gt=0),
                          service: TodoService = Depends(get_todo_service),
                          current_user = Depends(get_current_user),
@@ -32,7 +33,7 @@ async def get_todo_by_id(todo_id: int = Path(gt=0),
 
 
 # ===================== CREATE todo =====================
-@todo_router.post("/", status_code=status.HTTP_201_CREATED)
+@todo_router.post("/", status_code=status.HTTP_201_CREATED, response_model=TodoOut)
 async def create_todo(todo_req: TodoRequest, 
                       service: TodoService = Depends(get_todo_service),
                       current_user = Depends(get_current_user),
@@ -43,7 +44,7 @@ async def create_todo(todo_req: TodoRequest,
 
 
 # ===================== UPDATE todo =====================
-@todo_router.patch("/{todo_id}", status_code=status.HTTP_200_OK)
+@todo_router.patch("/{todo_id}", status_code=status.HTTP_200_OK, response_model=TodoOut)
 async def update_todo(todo_req: TodoUpdateRequest, todo_id: int = Path(gt=0), 
                       service: TodoService = Depends(get_todo_service),
                       current_user = Depends(get_current_user),

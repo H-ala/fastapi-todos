@@ -13,3 +13,6 @@ class TodoUpdateRequest(BaseModel):
     description: Optional[str] = Field(None, min_length=3, max_length=240)
     priority: Optional[int] = Field(None, gt=0, lt=6)
     complete: Optional[bool] = None
+
+class TodoOut(TodoRequest):
+    pass
