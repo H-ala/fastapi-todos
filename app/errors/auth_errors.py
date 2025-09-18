@@ -13,8 +13,6 @@ class RevokedToken(AuthError):
     """User has provided a token that has been revoked"""
     pass
 
-class FieldRequired(AuthError):
-    pass
 
 class InvalidToken(AuthError):
     """User has provided invalid or expired token"""

@@ -12,7 +12,4 @@ class RefreshToken(BaseModel):
 class RefreshTokenRequest(BaseModel):
     refresh_token: str = Field(..., min_length=64, max_length=100)
 
-class LoginRequest(BaseModel):
-    username: Optional[str] = Field(None, min_length=3)
-    email: Optional[EmailStr] = Field(None)
-    password: str = Field(...)
+

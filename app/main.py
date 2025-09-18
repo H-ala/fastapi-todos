@@ -20,6 +20,8 @@ app = FastAPI(
 def health_check():
     return {"message": "Hello World"}
 
+
+
 register_all_errors(app)
 
 app.include_router(todo_router, prefix=f"/api/{version}", tags=["todos"])

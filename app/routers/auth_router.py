@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status
+from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.responses import JSONResponse
 from app.services.auth_service import AuthService
-from app.schemas.auth_schema import LoginRequest
 from app.utils.security import create_access_token, create_refresh_token
 from app.core.dependencies import get_auth_service, get_current_user
 from app.schemas.auth_schema import RefreshTokenRequest
@@ -17,12 +17,13 @@ auth_router = APIRouter(prefix="/auth")
 
 # ===================== GET access token =====================
 @auth_router.post("/login", status_code=status.HTTP_200_OK)
-async def get_all_users(login_data: LoginRequest, 
+async def get_all_users(form_data: OAuth2PasswordRequestForm = Depends(), 
                         service: AuthService = Depends(get_auth_service)):
+    
+    identifier = form_data.username
     user_data = await service.authenticate_user(
-        username=login_data.username,
-        email=login_data.email,
-        password=login_data.password
+        username_or_email=identifier,
+        password=form_data.password
     )
 
     access_token = create_access_token(dict(user_data))

@@ -10,7 +10,7 @@ from app.errors.user_errors import (
 )
 
 from app.errors.auth_errors import (
-    InvalidCredentials, RevokedToken, FieldRequired, InvalidToken,
+    InvalidCredentials, RevokedToken, InvalidToken,
     AccessTokenRequired, InsufficientPermission
 )
 
@@ -98,17 +98,6 @@ def register_all_errors(app: FastAPI):
                 "message": "Token is invalid or has been revoked",
                 "resolution": "Please get new token",
                 "error_code": "token_revoked"
-            }
-        )
-    )
-    app.add_exception_handler(
-        FieldRequired,
-        create_exception_handler(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            initial_details={
-                "message": "At least one field must be filled",
-                "resolution": "provide email or username",
-                "error_code": "no field to authenticate"
             }
         )
     )

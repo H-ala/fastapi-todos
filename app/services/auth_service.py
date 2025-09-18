@@ -1,12 +1,13 @@
 from app.repos.auth_repo import AuthRepo
 from app.repos.user_repo import UserRepo
 from app.utils.security import decode_access_token
-from app.errors.auth_errors import InvalidCredentials, RevokedToken, FieldRequired, InvalidToken
+from app.errors.auth_errors import InvalidCredentials, RevokedToken, InvalidToken
 from app.errors.user_errors import UserNotFound
 from jose import JWTError
 from app.utils.security import verify_password, hash_refresh_token, create_access_token
 from app.core.config import settings
 from datetime import datetime, timedelta
+import re
 
 
 
@@ -17,19 +18,15 @@ class AuthService:
         self.user_repo = user_repo
 
 
-    async def authenticate_user(self, username: str, email: str, password: str):
-        if not username and not email:
-            raise FieldRequired()
-    
-        user = None
-        if username:
-            user = await self.user_repo.get_user_by_username(username)
-        if not user and email:
-            user = await self.user_repo.get_user_by_email(email)
+    async def authenticate_user(self, username_or_email: str, password: str):
+        if re.match(r"[^@]+@[^@]+\.[^@]+", username_or_email):
+            user = await self.user_repo.get_user_by_email(username_or_email)
+        else:
+            user = await self.user_repo.get_user_by_username(username_or_email)
 
-        if not user:
-            raise UserNotFound()
-        if not verify_password(password, user.hashed_password):
+        # if not user:
+        #     raise UserNotFound()
+        if not user or not verify_password(password, user.hashed_password):
             raise InvalidCredentials()
             
         return user

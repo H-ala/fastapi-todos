@@ -17,7 +17,7 @@ from app.services.todo_service import TodoService
 
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 def get_todo_repo(db: AsyncSession = Depends(get_db)) -> TodoRepo:
     return TodoRepo(db)
